@@ -4,7 +4,9 @@ package com.brianfigueroa.games.snake;
 import javax.swing.*;
 
 public class GameFrame extends JFrame {
-
+    public static void main(String[] args) {
+        new GameFrame();
+    }
     public GameFrame() {
 
         this.add(new GamePanel());
@@ -16,3 +18,4 @@ public class GameFrame extends JFrame {
         this.setLocationRelativeTo(null);
     }
 }
+

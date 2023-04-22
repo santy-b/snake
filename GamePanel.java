@@ -27,12 +27,12 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     private void startGame() {
-            var delay = 75;
-            newApple();
-            Panel.BODY_PARTS.value = 6;
-            running = true;
-            paused = false;
-            new Timer(delay, this).start();
+        int delay = 75;
+        newApple();
+        Panel.BODY_PARTS.value = 6;
+        running = true;
+        paused = false;
+        new Timer(delay, this).start();
     }
 
     public void paintComponent(Graphics g) {
@@ -47,21 +47,18 @@ public class GamePanel extends JPanel implements ActionListener {
             g.setColor(Color.red);
             g.fillOval(appleX, appleY, Panel.UNIT_SIZE.value, Panel.UNIT_SIZE.value);
 
-            for (var i = 0; i < Panel.BODY_PARTS.value; i++) {
+            for (int i = 0; i < Panel.BODY_PARTS.value; i++) {
                 if (i == 0) {
                     g.setColor(Color.green);
-                }
-                else {
+                } else {
                     g.setColor(new Color(45, 180, 0));
                 }
                 g.fillOval(x[i], y[i], Panel.UNIT_SIZE.value, Panel.UNIT_SIZE.value);
             }
             gameText.score(g, applesEaten);
-        }
-        else {
+        } else {
             gameText.scoreAndGameOver(g, applesEaten);
         }
-
     }
 
     private void newApple() {
@@ -71,16 +68,26 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void move() {
         if (!paused) {
-            for (var i = Panel.BODY_PARTS.value; i > 0; i--) {
+            for (int i = Panel.BODY_PARTS.value; i > 0; i--) {
                 x[i] = x[i - 1];
                 y[i] = y[i - 1];
             }
 
             switch (direction) {
-                case 'U' -> y[0] = y[0] - Panel.UNIT_SIZE.value;
-                case 'D' -> y[0] = y[0] + Panel.UNIT_SIZE.value;
-                case 'L' -> x[0] = x[0] - Panel.UNIT_SIZE.value;
-                case 'R' -> x[0] = x[0] + Panel.UNIT_SIZE.value;
+                case 'U':
+                    y[0] = y[0] - Panel.UNIT_SIZE.value;
+                    break;
+                case 'D':
+                    y[0] = y[0] + Panel.UNIT_SIZE.value;
+                    break;
+                case 'L':
+                    x[0] = x[0] - Panel.UNIT_SIZE.value;
+                    break;
+                case 'R':
+                    x[0] = x[0] + Panel.UNIT_SIZE.value;
+                    break;
+                default:
+                    // Handle the default case if necessary
             }
         }
     }
@@ -91,74 +98,82 @@ public class GamePanel extends JPanel implements ActionListener {
             applesEaten++;
             newApple();
         }
-
     }
 
     private boolean checkCollisions() {
-        return checkBodyCollisions(Panel.BODY_PARTS.value) ||
-                checkBorderCollisions(Panel.SCREEN_WIDTH.value, Panel.SCREEN_HEIGHT.value);
+        return checkBodyCollisions(Panel.BODY_PARTS.value) || checkBorderCollisions(Panel.SCREEN_WIDTH.value, Panel.SCREEN_HEIGHT.value);
     }
 
     private boolean checkBodyCollisions(int bodyParts) {
-        for(int i = bodyParts; i > 0; i--) {
-            if ((x[0] == x[i]) && (y[0] == y[i])) {
+        for (int i = bodyParts; i > 0; i--) {
+            if (x[0] == x[i] && y[0] == y[i]) {
                 running = false;
                 break;
             }
-            else
-                running = true;
         }
         return !running;
     }
 
     private boolean checkBorderCollisions(int width, int height) {
-        if (x[0] < 0 || x[0] > width)
+        if (x[0] < 0 || x[0] > width || y[0] < 0 || y[0] > height) {
             running = false;
-
-        if (y[0] < 0 || y[0] > height)
-            running = false;
-
+        }
         return !running;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
-        if(running) {
-            move();
-            checkApple();
-            checkCollisions();
+        if (running) {
+            if (!paused) {
+                move();
+                checkApple();
+                checkCollisions();
+            }
         }
         repaint();
     }
-
 
     private class MyKeyAdapter extends KeyAdapter {
         @Override
         public void keyPressed(KeyEvent e) {
             var key = e.getKeyCode();
 
-            if (key == KeyEvent.VK_LEFT && direction != 'R')
-                direction = 'L';
+            switch(key) {
+                case KeyEvent.VK_LEFT:
+                    if (direction != 'R')
+                        direction = 'L';
+                    break;
 
-            if (key == KeyEvent.VK_RIGHT && direction != 'L')
-                direction = 'R';
+                case KeyEvent.VK_RIGHT:
+                    if (direction != 'L')
+                        direction = 'R';
+                    break;
 
-            if (key == KeyEvent.VK_UP && direction != 'D')
-                direction = 'U';
+                case KeyEvent.VK_UP:
+                    if (direction != 'D')
+                        direction = 'U';
+                    break;
 
-            if (key == KeyEvent.VK_DOWN && direction != 'U')
-                direction = 'D';
+                case KeyEvent.VK_DOWN:
+                    if (direction != 'U')
+                        direction = 'D';
+                    break;
 
-            if (key == KeyEvent.VK_P)
-                paused = true;
+                case KeyEvent.VK_P:
+                    paused = true;
+                    break;
 
-            if (key == KeyEvent.VK_S)
-                paused = false;
+                case KeyEvent.VK_S:
+                    paused = false;
+                    break;
 
-            if (key == KeyEvent.VK_R && !running)
-
-                new GameFrame();
+                case KeyEvent.VK_R:
+                    if (!running) {
+                        new GameFrame();
+                    }
+                    break;
+            }
         }
     }
+
 }
